@@ -38,7 +38,6 @@ No plugins and no `libshacccg.suprx` are needed: the shaders are compiled in adv
 
 The game reads everything from the image. Saves go to `ux0:data/dolphinblue/`: `sram.bin` (scores, settings),
 `hiscores.bin` and `state.bin` (a save state taken at the start of each mission, resumed at the next start).
-The picture fills the screen; an empty file `ux0:data/dolphinblue/aspect43` shows it in 4:3 instead.
 The release VPK has no LiveArea images (the system shows its default icon).
 [Controls](docs/vita-controls.md).
 
