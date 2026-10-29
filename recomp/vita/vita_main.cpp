@@ -421,6 +421,38 @@ static bool load(const std::string& path, uint8_t* dst, size_t max) {
     return n > 0;
 }
 
+// The high-density area starts at LBA 45000 (FAD = LBA + 150): IP.BIN is its first 16 sectors, and the ISO 9660
+// primary volume descriptor follows at LBA 45016; directory records hold absolute LBAs.
+static bool disc_load_ip(uint8_t* dst) {
+    for (uint32_t i = 0; i < 16; ++i) if (!disc_read_fad(45000 + 150 + i, dst + i * 2048)) return false;
+    std::printf("[disc] IP.BIN read from the disc image\n");
+    return true;
+}
+static bool disc_load_file(const char* name, uint8_t* dst, size_t max) {
+    uint8_t sec[2048];
+    if (!disc_read_fad(45016 + 150, sec) || std::memcmp(sec + 1, "CD001", 5) != 0) return false;
+    uint32_t dir_lba, dir_size; std::memcpy(&dir_lba, sec + 156 + 2, 4); std::memcpy(&dir_size, sec + 156 + 10, 4);
+    size_t nlen = std::strlen(name);
+    for (uint32_t s = 0; s < (dir_size + 2047) / 2048; ++s) {
+        if (!disc_read_fad(dir_lba + s + 150, sec)) return false;
+        for (uint32_t o = 0; o < 2048 && sec[o];) {
+            const uint8_t* r = sec + o;
+            if (r[32] >= nlen && std::memcmp(r + 33, name, nlen) == 0 && (r[32] == nlen || r[33 + nlen] == ';')) {
+                uint32_t lba, size; std::memcpy(&lba, r + 2, 4); std::memcpy(&size, r + 10, 4);
+                if (size > max) return false;
+                for (uint32_t i = 0; i * 2048 < size; ++i) {
+                    if (!disc_read_fad(lba + i + 150, sec)) return false;
+                    std::memcpy(dst + i * 2048, sec, std::min<uint32_t>(2048, size - i * 2048));
+                }
+                std::printf("[disc] %s read from the disc image (%u bytes)\n", name, (unsigned)size);
+                return true;
+            }
+            o += r[0];
+        }
+    }
+    return false;
+}
+
 static int game_thread(SceSize, void*) {
     stdout = stderr;
     static std::vector<uint8_t> m_vram(VRAM_SIZE), m_aram(ARAM_SIZE), m_oc(8192), m_sram(128 * 1024, 0xFF);
@@ -428,9 +460,11 @@ static int game_thread(SceSize, void*) {
     // Saves: the board's 128 KB SRAM (scores, settings) persists in ux0:data/dolphinblue/sram.bin
     if (FILE* f = std::fopen("ux0:data/dolphinblue/sram.bin", "rb")) { size_t n = std::fread(sram, 1, m_sram.size(), f); std::fclose(f); std::printf("[save] sram.bin loaded (%u bytes)\n", (unsigned)n); }
     std::string base = BASE;
-    if (!load(base + "/IP.BIN", ram + 0x8000, 0x8000)) fatal("missing %s/IP.BIN", BASE);
-    if (!load(base + "/1ST_READ.BIN", ram + 0x10000, RAM_SIZE - 0x10000)) fatal("missing %s/1ST_READ.BIN", BASE);
     if (!disc_open(base + "/disc")) fatal("no .gdi found in %s/disc", BASE);
+    // IP.BIN and 1ST_READ.BIN: from ux0:data/dolphinblue/ when present, otherwise read from the disc image
+    if (!load(base + "/IP.BIN", ram + 0x8000, 0x8000) && !disc_load_ip(ram + 0x8000)) fatal("cannot read IP.BIN");
+    if (!load(base + "/1ST_READ.BIN", ram + 0x10000, RAM_SIZE - 0x10000) && !disc_load_file("1ST_READ.BIN", ram + 0x10000, RAM_SIZE - 0x10000))
+        fatal("cannot read 1ST_READ.BIN");
     if (!render::backend_init(640, 480)) fatal("GXM init failed");
     { SceIoStat st_; if (sceIoGetstat("ux0:data/dolphinblue/fmttest", &st_) >= 0) { render::backend_format_test(); } }
     // ARM7 sound CPU (thread created below on core 1): runs the samples the guest's clock has made due, and mixes the audio

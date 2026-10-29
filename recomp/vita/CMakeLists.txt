@@ -46,7 +46,8 @@ vita_create_self(eboot.bin dolphinblue UNSAFE)
 # offline shader bank (vita/shaders/*.gxp, generated once with the "shaderbank" switch) -> app0:shaders
 file(GLOB SHADER_BANK ${CMAKE_SOURCE_DIR}/shaders/*.gxp)
 # LiveArea images (sce_sys/icon0.png, sce_sys/livearea/contents/{bg,startup}.png, template.xml) are packed when present
-set(VPK_FILES FILE ${CMAKE_SOURCE_DIR}/third_party/libperf/lib/libperf.suprx libperf.suprx FILE ${CMAKE_SOURCE_DIR}/third_party/libperf/lib/libperf.skprx libperf.skprx)
+set(VPK_FILES FILE ${CMAKE_SOURCE_DIR}/third_party/libperf/lib/libperf.suprx libperf.suprx FILE ${CMAKE_SOURCE_DIR}/third_party/libperf/lib/libperf.skprx libperf.skprx
+    FILE ${CMAKE_SOURCE_DIR}/third_party/libperf/LICENSE licenses/libperf-LICENSE.txt FILE ${CMAKE_SOURCE_DIR}/../../THIRD-PARTY-NOTICES.md licenses/THIRD-PARTY-NOTICES.md)
 foreach(a icon0.png livearea/contents/bg.png livearea/contents/startup.png livearea/contents/template.xml)
   if(EXISTS ${CMAKE_SOURCE_DIR}/sce_sys/${a})
     list(APPEND VPK_FILES FILE ${CMAKE_SOURCE_DIR}/sce_sys/${a} sce_sys/${a})

@@ -7,11 +7,10 @@ GD-ROM and the BIOS calls. There is no emulator, interpreter or JIT on the hot p
 
 The repository contains no game code or data. You need your own GDI image of the Dreamcast conversion of
 Dolphin Blue (`.gdi` + `track01.iso`, `track02.raw`, `track03.iso`, `track04.iso`). The translation is made for
-this executable (`1ST_READ.BIN`, extracted in step 1 of [Building](#1-extract-the-disc)):
+this image:
 
 ```
-e2c99f4bb920d515437079a2ff13ea59e6b06c61eefdac82d583749663258d81  1ST_READ.BIN   (sha256)
-47327cf4db9ace57ee2bba4948c5ccd343b44f95807fdfc9ae946e03dbb6db0a  track03.iso
+47327cf4db9ace57ee2bba4948c5ccd343b44f95807fdfc9ae946e03dbb6db0a  track03.iso   (sha256)
 003db9663a62d6d9061892759cc3b8e5bd7083c7fd852750f4a2b4aad1a92a6b  track04.iso
 ```
 
@@ -22,32 +21,26 @@ How the port runs on a 444 MHz Cortex-A9: [docs/optimizations.md](docs/optimizat
 
 ## Installing on the PS Vita
 
-Requirements: a PS Vita with HENkaku/Ensō and [VitaShell](https://github.com/TheOfficialFloW/VitaShell/releases).
-No plugins are needed. The shaders are compiled in advance and packed in the VPK, so `libshacccg.suprx`
-is not needed either.
+You need a PS Vita with HENkaku/Ensō and [VitaShell](https://github.com/TheOfficialFloW/VitaShell/releases).
+No plugins and no `libshacccg.suprx` are needed: the shaders are compiled in advance and packed in the VPK.
 
-1. Copy `dolphinblue.vpk` from the [release](../../releases) to the Vita and install it with VitaShell.
-2. On your PC, extract `IP.BIN` and `1ST_READ.BIN` from your disc image (see [Building](#1-extract-the-disc),
-   step 1; only Python 3 is needed for it).
-3. Create the folder `ux0:data/dolphinblue/` on the Vita and copy into it:
+1. Install `dolphinblue.vpk` from the [releases](../../releases) with VitaShell.
+2. Copy your disc image (the `.gdi` file and its tracks) to `ux0:data/dolphinblue/disc/`:
    ```
-   ux0:data/dolphinblue/IP.BIN
-   ux0:data/dolphinblue/1ST_READ.BIN
-   ux0:data/dolphinblue/disc/Dolphin Blue.gdi     (any name ending in .gdi)
+   ux0:data/dolphinblue/disc/Dolphin Blue.gdi
    ux0:data/dolphinblue/disc/track01.iso
    ux0:data/dolphinblue/disc/track02.raw
    ux0:data/dolphinblue/disc/track03.iso
    ux0:data/dolphinblue/disc/track04.iso
    ```
-4. Start Dolphin Blue from the LiveArea.
+   The name of the `.gdi` file doesn't matter.
+3. Start Dolphin Blue.
 
-The release VPK has no LiveArea images (the system shows its default icon). The game writes its saves to
-`ux0:data/dolphinblue/`: `sram.bin` (scores, settings), `hiscores.bin`, and `state.bin` (a save state taken at
-the start of each mission; the game resumes from it at the next launch).
-
-The picture fills the screen (960x544); an empty file `ux0:data/dolphinblue/aspect43` shows it in 4:3 instead.
-
-Controls: [docs/vita-controls.md](docs/vita-controls.md).
+The game reads everything from the image. Saves go to `ux0:data/dolphinblue/`: `sram.bin` (scores, settings),
+`hiscores.bin` and `state.bin` (a save state taken at the start of each mission, resumed at the next start).
+The picture fills the screen; an empty file `ux0:data/dolphinblue/aspect43` shows it in 4:3 instead.
+The release VPK has no LiveArea images (the system shows its default icon).
+[Controls](docs/vita-controls.md).
 
 ## Building
 
@@ -58,7 +51,7 @@ Tested on x86-64 Linux. Every target needs Python 3, CMake 3.16+, Ninja and Git.
   [SceShaccCgExt](https://github.com/bythos14/SceShaccCgExt) (VitaSDK packages, `vdpm`).
   The release was built with arm-vita-eabi-gcc 15.2.0, vita-toolchain `c527abce`, vita-headers `ebc8f4f7`,
   newlib `64aa7aa3`, pthread-embedded `11d2e572`; with these the build below gives the release `eboot.bin`
-  (sha256 `aaa638eb2e5d55e2d7aff76a86466b5f6a764bdafcc77f69140ed07d3ee97a84`).
+  (sha256 `2aaf88be1e93daaebbb996599bf53a79f279b758197af6140fb58a6a88178072`).
 - Linux: clang, zlib, EGL.
 
 ### 1. Extract the disc
@@ -102,6 +95,9 @@ build/desktop/sh4_tests
 ```
 
 ## Credits
+
+Licences of the linked libraries: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
 
 - [VitaSDK](https://vitasdk.org)
 - [vitaShaRK](https://github.com/Rinnegatamante/vitaShaRK) — Rinnegatamante (LGPL-3.0)
