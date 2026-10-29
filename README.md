@@ -107,3 +107,9 @@ Licences of the linked libraries: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.m
 - [Grarak, mh3-wii](https://github.com/Grarak/mh3-wii): method and optimisation order
 - [Ghidra](https://github.com/NationalSecurityAgency/ghidra), [Capstone](https://github.com/capstone-engine/capstone):
   decoder cross-checks (`recomp/tools/xcheck*.py`)
+
+## License
+
+The code in this repository is licensed under the GNU General Public License v3.0 (`LICENSE`), copyright
+Tobic-99. Third-party components keep their own licences ([THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)).
+Dolphin Blue is the property of its rights holders; no part of the game is included.
