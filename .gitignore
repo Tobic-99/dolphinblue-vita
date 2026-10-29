@@ -1,0 +1,19 @@
+# Game data and anything generated from it
+/disc/
+/extract/
+/recomp/gen/
+/recomp/host/arm7_blocks.inc
+/recomp/host/aica_dsp_progs.inc
+*.gdi
+*.iso
+*.raw
+*.BIN
+*.bin
+!/recomp/tests/gen/test_image.bin
+/recomp/vita/sce_sys/
+# build output
+/build/
+/recomp/build/
+*.vpk
+eboot.bin
+__pycache__/

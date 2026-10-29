@@ -1,0 +1,26 @@
+cmake_minimum_required(VERSION 3.16)
+project(dolphinblue_recomp CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+# Generated code: run `python3 tools/codegen.py gen` and `python3 tools/gen_tests.py tests/gen` first.
+add_compile_options(-fno-strict-aliasing -Wno-tautological-compare)
+
+file(GLOB DB_GEN_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/gen/db_funcs_*.cpp)
+add_library(db_recomp STATIC ${DB_GEN_SOURCES} ${CMAKE_SOURCE_DIR}/gen/db_dispatch.cpp)
+target_include_directories(db_recomp PUBLIC ${CMAKE_SOURCE_DIR}/runtime ${CMAKE_SOURCE_DIR}/gen)
+
+add_executable(sh4_tests tests/test_main.cpp tests/gen/test_funcs.cpp)
+target_include_directories(sh4_tests PRIVATE runtime tests/gen)
+target_compile_definitions(sh4_tests PRIVATE TEST_IMAGE="${CMAKE_SOURCE_DIR}/tests/gen/test_image.bin")
+enable_testing()
+add_test(NAME sh4_tests COMMAND sh4_tests)
+
+file(GLOB DB_HOST_SOURCES CONFIGURE_DEPENDS ${CMAKE_SOURCE_DIR}/host/*.cpp ${CMAKE_SOURCE_DIR}/render/*.cpp)
+add_executable(db_run ${DB_HOST_SOURCES})
+find_library(EGL_LIB NAMES libEGL.so.1 EGL)
+target_link_libraries(db_run PRIVATE db_recomp m z ${EGL_LIB})
+target_link_options(db_run PRIVATE -rdynamic)
+target_include_directories(db_run PRIVATE runtime host)
