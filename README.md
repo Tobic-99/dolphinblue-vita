@@ -14,6 +14,8 @@ this image:
 003db9663a62d6d9061892759cc3b8e5bd7083c7fd852750f4a2b4aad1a92a6b  track04.iso
 ```
 
+This port is intended only for owners of the game. Do not ask how to get the disc image: piracy is not supported.
+
 The VPK holds the translated code and nothing of the disc: textures, models, sound and the executable's data
 are read from your image.
 
